@@ -16,18 +16,27 @@ def setUpDatabase(db_name):
 # TASK 1
 # CREATE TABLE FOR EMPLOYEE INFORMATION IN DATABASE AND ADD INFORMATION
 def create_employee_table(cur, conn):
-    pass
+
+    cur.execute( """CREATE TABLE IF NOT EXISTS employees 
+                (employee_id INTEGER PRIMARY KEY, 
+                first_name TEXT, last_name TEXT, hire_date TEXT,
+                job_id INTEGER, salary INTEGER)""" )
+    conn.commit()
 
 # ADD EMPLOYEE'S INFORMTION TO THE TABLE
-
 def add_employee(filename, cur, conn):
     #load .json file and read job data
     # WE GAVE YOU THIS TO READ IN DATA
     f = open(os.path.abspath(os.path.join(os.path.dirname(__file__), filename)))
     file_data = f.read()
     f.close()
-    # THE REST IS UP TO YOU
-    pass
+
+    employees = json.loads(file_data)
+    for employee in employees:
+        cur.execute("""INSERT OR IGNORE INTO employees (employee_id, first_name, last_name, hire_date, job_id, salary)
+                     VALUES (?, ?, ?, ?, ?, ?)""", (employee["employee_id"], employee["first_name"], employee["last_name"], 
+                     employee["hire_date"], employee["job_id"], employee["salary"]))
+    conn.commit()
 
 # TASK 2: GET JOB AND HIRE_DATE INFORMATION
 def job_and_hire_date(cur, conn):
