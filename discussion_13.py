@@ -48,11 +48,29 @@ def job_and_hire_date(cur, conn):
 # TASK 3: IDENTIFY PROBLEMATIC SALARY DATA
 # Apply JOIN clause to match individual employees
 def problematic_salary(cur, conn):
-    pass
+    cur.execute("""SELECT e.first_name, e.last_name FROM employees AS e
+                   INNER JOIN jobs AS j ON e.job_id = j.job_id
+                   WHERE e.salary < j.min_salary OR e.salary > j.max_salary""")
+    return cur.fetchall()
 
 # TASK 4: VISUALIZATION
 def visualization_salary_data(cur, conn):
-    pass
+
+    cur.execute("""SELECT e.salary, j.job_title FROM employees AS e
+                   INNER JOIN jobs AS j ON e.job_id = j.job_id""")
+    employees = cur.fetchall()
+
+    s = [ r[0] for r in employees ]
+    t = [ r[1] for r in employees ]
+    plt.scatter(t, s)
+
+    cur.execute("SELECT job_title, min_salary, max_salary FROM jobs")
+    for job in cur.fetchall():
+        plt.scatter(job[0], job[1], color = 'red', marker = 'x')
+        plt.scatter(job[0], job[2], color = 'red', marker = 'x')
+
+    plt.xticks(rotation = 40)
+    plt.show( block = True ) #exit plot to end script
 
 class TestDiscussion12(unittest.TestCase):
     def setUp(self) -> None:
@@ -87,6 +105,7 @@ def main():
 
     wrong_salary = (problematic_salary(cur, conn))
     print(wrong_salary)
+    visualization_salary_data(cur, conn)
 
 if __name__ == "__main__":
     main()
